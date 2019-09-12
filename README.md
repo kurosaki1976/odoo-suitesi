@@ -128,5 +128,5 @@ Luego de copiados los módulos de la Suite SI, se accede a tavés de un navagead
 
 ## Referencias
 
-[OCS Inventory Professionnel](https://www.ocsinventory-ng.org/)
-[ERP y CRM de código abierto | Odoo](https://www.odoo.com/es_ES/)
+* [OCS Inventory Professionnel](https://www.ocsinventory-ng.org/)
+* [ERP y CRM de código abierto | Odoo](https://www.odoo.com/es_ES/)
