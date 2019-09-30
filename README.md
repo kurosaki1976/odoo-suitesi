@@ -1,8 +1,12 @@
 # Instalación y configuración de la Suite de Seguridad Informática en Debian 9 Stretch
 
+## Autor
+
+- [Ixen Rodríguez Pérez - kurosaki1976](ixenrp1976@gmail.com)
+
 ## ¿Qué es la Suite Seguridad Informática?
 
-La Suite de Seguridad Informática es un proyecto para la gestión de la seguridad a nivel empresarial, desarrollado por la división de DeSoft en Las Tunas. Esta aplicación permite la automatización de los servicios, la vigilancia y control sobre el software y hardware que conforman el patrimonio informático de una institución. A juicio de sus creadores, tiene como valor agregado promover una mayor cultura de los empresarios y funcionarios hacia la importancia de la seguridad informática. La aplicación está soportada en la versión 8 de Odoo y necesita OCSInventory para el sondeo de hardware/software de los equipos que integran la red.
+La Suite de Seguridad Informática (Suite SI) es un proyecto para la gestión de la seguridad a nivel empresarial, desarrollado por la división de DeSoft en Las Tunas. Esta aplicación permite la automatización de los servicios, la vigilancia y control sobre el software y hardware que conforman el patrimonio informático de una institución. A juicio de sus creadores, tiene como valor agregado promover una mayor cultura de los empresarios y funcionarios hacia la importancia de la seguridad informática. La aplicación está soportada en la versión 8 de Odoo y necesita OCSInventory para el sondeo de hardware/software de los hosts que integran la red.
 
 ```
 ## Breve introducción a OCSInventory NG
@@ -16,7 +20,7 @@ La Suite de Seguridad Informática es un proyecto para la gestión de la segurid
 
 ## Breve introducción a Odoo
 
-Odoo es un software de ERP integrado. Cuenta con una versión "comunitaria" de código abierto bajo licencia LGPLv3 y una versión empresarial bajo licencia comercial que complementa la edición comunitaria con características y servicios comerciales y desarrollada por la empresa belga Odoo S.A.
+Odoo es un software de ERP integrado. Cuenta con una versión "comunitaria" de código abierto bajo licencia LGPLv3 y una versión empresarial bajo licencia comercial que complementa la edición comunitaria con características y servicios comerciales; ambas desarrolladas por la empresa belga Odoo S.A.
 
 ### ¿Qué es un software ERP?
 
@@ -28,7 +32,7 @@ Existen varios métodos de instalación de Odoo, y aunque parezca paradójico, t
 
 ### Servidor de bases de datos
 
-Para su buen funcionamiento Odoo necesita un servidor PostgreSQL como gestor de bases de datos. Por defecto, la instancia de Odoo se ejecuta en el mismo host que funciona como servidor de bases de datos.
+Para su buen funcionamiento Odoo necesita un servidor PostgreSQL como gestor de bases de datos. Por defecto, la instancia de Odoo se ejecuta en el mismo host que funciona como servidor de bases de datos, aunque se pude utilizar un host distinto; pero no es objetivo de este tutorial.
 
 ```
 apt install postgresql -y
@@ -38,10 +42,10 @@ En este punto, no es necesario realizar configuración alguna del servicio `post
 
 ### Odoo
 
-Tanto Odoo como la Suite de Seguridad Informática tienen dependencias de `python`, las cuales deben ser instaladas en el sistema.
+Tanto Odoo como la Suite SI tienen dependencias de `python`, las cuales deben ser instaladas en el sistema.
 
 ```
-apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap -y
+apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap
 ```
 
 En el caso específico de Debian 9, deben ser instalados además los paquetes `python-support`, `python-pypdf` y `wkhtmltopdf`. Para los 2 primeros paquetes, deben usarse los disponibles en la versión de Debian 8.
@@ -125,6 +129,8 @@ systemctl restart odoo.service
 Luego de copiados los módulos de la Suite SI, se accede a tavés de un navageador web a la dirección `http://nombre_dirección_ip_servidor_odo:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
 
 ## Conclusiones
+
+Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7` y `Odoo v8.0`; es invaluable la importancia de un proyecto de esta embargadura dentro del sistema empresarial e incluso privado, en Cuba. Esperamos que este tutorial sirva de guía para su implementación en aquellos escenarios donde se lleve a cabo la migración de servicios a plataformas bajo software libre, apuesta hoy del país en la búsqueda de la independencia y soberanía teconológicas.
 
 ## Referencias
 
