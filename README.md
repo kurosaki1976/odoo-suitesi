@@ -518,7 +518,7 @@ Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7`
 ## Referencias
 
 * [OCS Inventory Professionnel](https://www.ocsinventory-ng.org/)
-* [Setting up OCS Inventory Server] (https://wiki.ocsinventory-ng.org/03.Basic-documentation/Setting-up-a-OCS-Inventory-Server/)
+* [Setting up OCS Inventory Server](https://wiki.ocsinventory-ng.org/03.Basic-documentation/Setting-up-a-OCS-Inventory-Server/)
 * [OCS Inventory NG 2.5 install guide on Debian Stretch with SSL and Deployment](https://miloszengel.com/ocs-inventory-ng-2-5-install-guide-on-debian-stretch-with-ssl-and-deployment/)
 * [Instalar OCS Inventory Paso a paso](http://www.latindevelopers.com/articulo/instalar-ocs-inventory/)
 * [Comprehensive Perl Archive Network](https://www.cpan.org/)
