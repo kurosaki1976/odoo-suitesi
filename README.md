@@ -392,7 +392,7 @@ A partir de este momento ya se está en condiciones de instalar el software agen
 PsExec.exe \\NombreEquipo -u Administrador -p ADMIN_PASSWD -c OCS-NG-Windows-Agent-Setup.exe /S /NOSPLASH /NO_SYSTRAY /NOW /SSL=0 /SERVER=https://inventory.dominio.cu/ocsinventory
 ```
 
-# Descargas
+### Descargas
 
 * [Agent para Windows 2.6.0.0 64bits](https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.6.0.0/OCS-Windows-Agent-2.6.0.0.zip)
 * [Agent para Windows 2.4.0.0 32bits]https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.4.0.0/OCSNG-Windows-Agent-2.4.0.0.zip
