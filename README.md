@@ -294,12 +294,12 @@ nano /etc/apache2/conf-available/z-ocsinventory-server.conf
 * Nota: Prestar especial atención a los parámetros de conexión con el servidor `MySQL`.
 
 ```
-	PerlSetEnv OCS_DB_HOST 127.0.0.1
-	PerlSetEnv OCS_DB_PORT 3306
-	PerlSetEnv OCS_DB_NAME ocsinventory_db
-	PerlSetEnv OCS_DB_LOCAL ocsinventory_db
-	PerlSetEnv OCS_DB_USER ocsuser
-	PerlSetVar OCS_DB_PWD OCSUSER_PASSWORD
+PerlSetEnv OCS_DB_HOST 127.0.0.1
+PerlSetEnv OCS_DB_PORT 3306
+PerlSetEnv OCS_DB_NAME ocsinventory_db
+PerlSetEnv OCS_DB_LOCAL ocsinventory_db
+PerlSetEnv OCS_DB_USER ocsuser
+PerlSetVar OCS_DB_PWD OCSUSER_PASSWORD
 ```
 
 Crear host virtual para OCSInventory-NG
