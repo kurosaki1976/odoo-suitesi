@@ -8,14 +8,369 @@
 
 La Suite de Seguridad Informática (Suite SI) es un proyecto para la gestión de la seguridad a nivel empresarial, desarrollado por la división de DeSoft en Las Tunas. Esta aplicación permite la automatización de los servicios, la vigilancia y control sobre el software y hardware que conforman el patrimonio informático de una institución. A juicio de sus creadores, tiene como valor agregado promover una mayor cultura de los empresarios y funcionarios hacia la importancia de la seguridad informática. La aplicación está soportada en la versión 8 de Odoo y necesita OCSInventory para el sondeo de hardware/software de los hosts que integran la red.
 
-```
 ## Breve introducción a OCSInventory NG
 
-`Open Computer and Software Inventory Next Generation` es un software libre que permite a los Administradores de Tecnologías de la Információn gestionar el inventario de sus activos de TI. OCS-NG recopila información sobre el hardware y software de equipos existentes en la red que ejecutan el programa cliente `OCS Inventory Agent`.
+`Open Computer and Software Inventory Next Generation` es un software libre que permite a los Administradores de Tecnologías de la Információn gestionar el inventario de sus activos de TI. OCS-NG recopila información sobre el hardware y software de equipos que hay en la red que ejecutan el programa de cliente OCS `OCS Inventory Agent`. Puede utilizarse para visualizar el inventario a través de una interfaz web. Además, comprende la posibilidad de implementación de aplicaciones en los equipos de acuerdo a criterios de búsqueda, escanear la red por medio del IPDiscovery, o instalar aplicaciones remotamente creando paquetes de instalación.
+
+OCSInventory-NG funciona con el servidor web `Apache2` y el gestor de base de datos `MySQL`.
 
 ## Instalación de paquetes necesarios
 
+```
+apt install apache2 libapache2-mod-perl2 libxml-simple-perl libcompress-zlib-perl libdbi-perl libdbd-mysql-perl libapache-dbi-perl libnet-ip-perl libsoap-lite-perl libarchive-zip-perl make build-essential php-pclzip php7.0 libapache2-mod-php7.0 php7.0-common php-pear php7.0-cli php7.0-ldap libxml-simple-perl libio-compress-lzma-perl php7.0-gd php7.0-curl php-soap libsoap-lite-perl libmojolicious-perl libplack-perl php-mbstring php-zip -y
+```
+
+Instalar dependencias CPAN
+
+```
+cpan
+install CPAN
+reload cpan
+install XML::Entities
+exit
+```
+
+Crear certificado TLS autofirmado y asignar permisos necesarios
+
+```
+openssl req -x509 -sha512 -days 3650 -nodes \
+	-subj "/C=CU/ST=Provincia/L=Ciudad/O=Organización/OU=IT/CN=SuiteSI/emailAddress=postmaster@dominio.cu/" \
+	-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf \
+		<(printf "\n[SAN]\nsubjectAltName=DNS:suitesi.dominio.cu,DNS:inventory.dominio.cu,\
+		DNS:localhost,IP:127.0.0.1")) \
+	-newkey rsa:2048 \
+	-keyout /etc/ssl/private/SuiteSI.key \
+	-out /etc/ssl/certs/SuiteSI.crt
+
+chmod 0444 /etc/ssl/certs/SuiteSI.crt
+chmod 0400 /etc/ssl/private/SuiteSI.key
+```
+
+Comprobar correcta creación del certificado
+
+```
+openssl x509 -in /etc/ssl/certs/SuiteSI.crt -text -noout
+```
+
+Establecer zona horaria para `PHP`
+
+```
+cp /etc/php/7*/apache2/php.ini{,.org}
+sed -i "s/^;date\.timezone =.*$/date\.timezone = 'America\/Havana'/" /etc/php/7*/apache2/php.ini
+```
+
 ### Servidor de bases de datos
+
+Instalar servidor de base de datos MySQL
+
+```
+apt install mysql-server php-mysql -y
+```
+
+Configurar base de datos para OCSInventory-NG
+
+```
+mysql -u root
+	SET PASSWORD FOR 'root'@'localhost' = PASSWORD('MYSQL_ROOT_PASSWORD');
+	CREATE DATABASE ocsinventory_db;
+	CREATE USER 'ocsuser'@'%' IDENTIFIED BY 'OCSUSER_PASSWORD';
+	GRANT ALL PRIVILEGES ON ocsinventory_db.* TO 'ocsuser'@'localhost' WITH GRANT OPTION;
+	FLUSH PRIVILEGES;
+quit
+```
+
+### Instalación y configuración de OCSInventory-NG
+
+Descargar el paquete e instalarlo
+
+```
+wget https://github.com/OCSInventory-NG/OCSInventory-ocsreports/releases/download/2.3.1/OCSNG_UNIX_SERVER-2.3.1.tar.gz
+tar -xzmf OCSNG_UNIX_SERVER-2.3.1.tar.gz -C /usr/src/
+cd /usr/src/OCSNG_UNIX_SERVER-2.3.1
+sh setup.sh
+```
+
+* Nota: Se puede ir presionando la tecla `Enter` hasta finalizar, pero es recomendable ir leyendo cada una de las opciones de configuración que se presentan.
+
+Editar los ficheros de configuración de OCSInventory-NG
+
+```
+mv /etc/apache2/conf-available/ocsinventory-reports.conf{,.org}
+mv /etc/apache2/conf-available/z-ocsinventory-server.conf{,.org}
+```
+
+```
+nano /etc/apache2/conf-available/ocsinventory-reports.conf
+
+Alias /ocsreports /usr/share/ocsinventory-reports/ocsreports
+<Directory /usr/share/ocsinventory-reports/ocsreports>
+	<IfModule mod_authz_core.c>
+		Require all granted
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order deny,allow
+		Allow from all
+	</IfModule>
+	Options Indexes FollowSymLinks
+	DirectoryIndex index.php
+	AllowOverride Options
+    <IfModule mod_php5.c>
+        AddType application/x-httpd-php .php
+        php_flag file_uploads           on
+        php_value post_max_size         101m
+        php_value upload_max_filesize   100m
+        php_flag magic_quotes_gpc      off
+    </IfModule>
+    <IfModule mod_php7.c>
+        AddType application/x-httpd-php .php
+        php_flag file_uploads           on
+        php_value post_max_size         101m
+        php_value upload_max_filesize   100m
+        php_flag magic_quotes_gpc      off
+    </IfModule>
+</Directory>
+
+Alias /download /var/lib/ocsinventory-reports/download
+<Directory /var/lib/ocsinventory-reports/download>
+	<IfModule mod_authz_core.c>
+		Require all granted
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order deny,allow
+		Allow from all
+	</IfModule>
+</Directory>
+
+Alias /snmp /var/lib/ocsinventory-reports/snmp
+<Directory /var/lib/ocsinventory-reports/snmp>
+	<IfModule mod_authz_core.c>
+		Require all granted
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order deny,allow
+		Allow from all
+	</IfModule>
+</Directory>
+```
+
+```
+nano /etc/apache2/conf-available/z-ocsinventory-server.conf
+
+<IfModule mod_perl.c>
+	PerlSetEnv OCS_MODPERL_VERSION 2
+	PerlSetEnv OCS_DB_HOST 127.0.0.1
+	PerlSetEnv OCS_DB_PORT 3306
+	PerlSetEnv OCS_DB_NAME ocsinventory_db
+	PerlSetEnv OCS_DB_LOCAL ocsinventory_db
+	PerlSetEnv OCS_DB_USER ocsuser
+	PerlSetVar OCS_DB_PWD OCSUSER_PASSWORD
+	PerlSetEnv OCS_OPT_LOGPATH "/var/log/ocsinventory-server"
+	PerlSetEnv OCS_OPT_DBI_PRINT_ERROR 0
+	PerlSetEnv OCS_OPT_UNICODE_SUPPORT 1
+	PerlAddVar OCS_OPT_TRUSTED_IP 127.0.0.1
+	PerlSetEnv OCS_OPT_WEB_SERVICE_ENABLED 0
+	PerlSetEnv OCS_OPT_WEB_SERVICE_RESULTS_LIMIT 100
+	PerlSetEnv OCS_OPT_OPTIONS_NOT_OVERLOADED 0
+	PerlSetEnv OCS_OPT_COMPRESS_TRY_OTHERS 1
+	PerlSetEnv OCS_OPT_LOGLEVEL 0
+	PerlSetEnv OCS_OPT_PROLOG_FREQ 12
+	PerlSetEnv OCS_OPT_INVENTORY_ON_STARTUP 0
+	PerlSetEnv OCS_OPT_AUTO_DUPLICATE_LVL 15
+	PerlSetEnv OCS_OPT_SECURITY_LEVEL 0
+	PerlSetEnv OCS_OPT_LOCK_REUSE_TIME 600
+	PerlSetEnv OCS_OPT_TRACE_DELETED 0
+	PerlSetEnv OCS_OPT_FREQUENCY 0  
+	PerlSetEnv OCS_OPT_INVENTORY_DIFF 1
+	PerlSetEnv OCS_OPT_INVENTORY_TRANSACTION 1
+	PerlSetEnv OCS_OPT_INVENTORY_WRITE_DIFF 1
+	PerlSetEnv OCS_OPT_INVENTORY_CACHE_ENABLED 1
+	PerlSetEnv OCS_OPT_INVENTORY_CACHE_REVALIDATE 7
+	PerlSetEnv OCS_OPT_INVENTORY_CACHE_KEEP 1
+	PerlSetEnv OCS_OPT_DOWNLOAD 0
+	PerlSetEnv OCS_OPT_DOWNLOAD_PERIOD_LENGTH 10
+	PerlSetEnv OCS_OPT_DOWNLOAD_CYCLE_LATENCY 60
+	PerlSetEnv OCS_OPT_DOWNLOAD_FRAG_LATENCY 60
+	PerlSetEnv OCS_OPT_DOWNLOAD_GROUPS_TRACE_EVENTS 1
+	PerlSetEnv OCS_OPT_DOWNLOAD_PERIOD_LATENCY 60
+	PerlSetEnv OCS_OPT_DOWNLOAD_TIMEOUT 7
+	PerlSetEnv OCS_OPT_DOWNLOAD_EXECUTION_TIMEOUT 120
+	PerlSetEnv OCS_OPT_DEPLOY 0
+	PerlSetEnv OCS_OPT_ENABLE_GROUPS 1
+	PerlSetEnv OCS_OPT_GROUPS_CACHE_OFFSET 43200
+	PerlSetEnv OCS_OPT_GROUPS_CACHE_REVALIDATE 43200
+	PerlSetEnv OCS_OPT_IPDISCOVER 2
+	PerlSetEnv OCS_OPT_IPDISCOVER_BETTER_THRESHOLD 1
+	PerlSetEnv OCS_OPT_IPDISCOVER_LATENCY 100
+	PerlSetEnv OCS_OPT_IPDISCOVER_MAX_ALIVE 14
+	PerlSetEnv OCS_OPT_IPDISCOVER_NO_POSTPONE 0
+	PerlSetEnv OCS_OPT_IPDISCOVER_USE_GROUPS 1
+	PerlSetEnv OCS_OPT_GENERATE_OCS_FILES 0
+	PerlSetEnv OCS_OPT_OCS_FILES_FORMAT OCS
+	PerlSetEnv OCS_OPT_OCS_FILES_OVERWRITE 0
+	PerlSetEnv OCS_OPT_OCS_FILES_PATH /tmp
+	PerlSetEnv OCS_OPT_PROLOG_FILTER_ON 0
+	PerlSetEnv OCS_OPT_INVENTORY_FILTER_ENABLED 0
+	PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP 0
+	PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP_CACHE_TIME 300
+	PerlSetEnv OCS_OPT_INVENTORY_FILTER_ON 0
+	PerlSetEnv OCS_OPT_DATA_FILTER 0 
+	PerlSetEnv OCS_OPT_REGISTRY 1
+	PerlSetEnv OCS_OPT_SNMP 0
+	PerlSetEnv OCS_OPT_SNMP_INVENTORY_DIFF 1
+	PerlSetEnv OCS_OPT_SNMP_PRINT_HTTPS_ERROR 1
+	PerlSetEnv OCS_OPT_SESSION_VALIDITY_TIME 600
+	PerlSetEnv OCS_OPT_SESSION_CLEAN_TIME 86400
+	PerlSetEnv OCS_OPT_INVENTORY_SESSION_ONLY 0
+	PerlSetEnv OCS_OPT_ACCEPT_TAG_UPDATE_FROM_CLIENT 0
+	PerlSetEnv OCS_PLUGINS_PERL_DIR "/etc/ocsinventory-server/perl"
+	PerlSetEnv OCS_PLUGINS_CONF_DIR "/etc/ocsinventory-server/plugins"
+	PerlSetEnv OCS_OPT_PROXY_REVALIDATE_DELAY 3600
+	PerlSetEnv OCS_OPT_UPDATE 0
+	PerlModule Apache::DBI
+	PerlModule Compress::Zlib
+	PerlModule XML::Simple
+	PerlModule Apache::Ocsinventory::Plugins::Apache
+	PerlModule Apache::Ocsinventory::Plugins
+	PerlModule Apache::Ocsinventory
+	PerlModule Apache::Ocsinventory::Server::Constants
+	PerlModule Apache::Ocsinventory::Server::System
+	PerlModule Apache::Ocsinventory::Server::Communication
+	PerlModule Apache::Ocsinventory::Server::Inventory
+	PerlModule Apache::Ocsinventory::Server::Duplicate
+	PerlModule Apache::Ocsinventory::Server::Capacities::Registry
+	PerlModule Apache::Ocsinventory::Server::Capacities::Update
+	PerlModule Apache::Ocsinventory::Server::Capacities::Ipdiscover
+	PerlModule Apache::Ocsinventory::Server::Capacities::Download
+	PerlModule Apache::Ocsinventory::Server::Capacities::Notify
+	PerlModule Apache::Ocsinventory::Server::Capacities::Snmp
+	<Location /ocsinventory>
+		<IfModule mod_authz_core.c>
+			Require all granted
+		</IfModule>
+		<IfModule !mod_authz_core.c>
+			order deny,allow
+			allow from all
+		</IfModule>
+		SetHandler perl-script
+		PerlHandler Apache::Ocsinventory
+	</Location>
+
+	<Location /ocsplugins>
+		<IfModule mod_authz_core.c>
+			Require local
+		</IfModule>
+		<IfModule !mod_authz_core.c>
+			order deny,allow
+			allow from 127.0.0.1
+		</IfModule>
+		SetHandler perl-script
+		PerlHandler Apache::Ocsinventory::Plugins::Apache
+	</Location>
+
+	PerlModule Apache::Ocsinventory::SOAP
+	<location /ocsinterface>
+		SetHandler perl-script
+		PerlHandler "Apache::Ocsinventory::SOAP"
+		<IfModule mod_authz_core.c>
+			Require all granted
+		</IfModule>
+		<IfModule !mod_authz_core.c>
+			Order deny,allow
+			Allow from all
+		</IfModule>
+			AuthType Basic
+			AuthName "OCS Inventory SOAP Area"
+			AuthUserFile "APACHE_AUTH_USER_FILE"
+		<IfModule mod_authz_core.c>
+			Require user "SOAP_USER"
+		</IfModule>
+		<IfModule !mod_authz_core.c>
+			require "SOAP_USER"
+		</IfModule>
+	</location>
+</IfModule>
+```
+
+* Nota: Prestar especial atención a los parámetros de conexión con el servidor `MySQL`.
+
+```
+	PerlSetEnv OCS_DB_HOST 127.0.0.1
+	PerlSetEnv OCS_DB_PORT 3306
+	PerlSetEnv OCS_DB_NAME ocsinventory_db
+	PerlSetEnv OCS_DB_LOCAL ocsinventory_db
+	PerlSetEnv OCS_DB_USER ocsuser
+	PerlSetVar OCS_DB_PWD OCSUSER_PASSWORD
+```
+
+Crear host virtual para OCSInventory-NG
+
+```
+nano /etc/apache2/sites-available/OCSInventory-NG.conf
+
+<VirtualHost *:80>
+    RewriteEngine on
+    RewriteCond %{HTTPS} =off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [QSA,L,R=301]
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+	<VirtualHost inventory.dominio.cu:443>
+		ServerName inventory.dominio.cu
+		ServerAdmin webmaster@dominio.cu
+		DocumentRoot /usr/share/ocsinventory-reports/ocsreports
+		ErrorLog ${APACHE_LOG_DIR}/ocs-error.log
+		CustomLog ${APACHE_LOG_DIR}/ocs-access.log combined
+		SSLEngine on
+		SSLCertificateFile /etc/ssl/certs/SuiteSI.crt
+		SSLCertificateKeyFile /etc/ssl/private/SuiteSI.key
+		<FilesMatch "\.(cgi|shtml|phtml|php)$">
+			SSLOptions +StdEnvVars
+		</FilesMatch>
+		<Directory /usr/lib/cgi-bin>
+			SSLOptions +StdEnvVars
+		</Directory>
+		BrowserMatch "MSIE [2-6]" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
+		BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+		<Directory /var/lib/ocsinventory-reports/download>
+		    Options Indexes FollowSymLinks MultiViews
+		    <IfModule mod_authz_core.c>
+				Require all granted
+		    </IfModule>
+		    <IfModule !mod_authz_core.c>
+				Order deny,allow
+				Allow from all
+		    </IfModule>
+		</Directory>
+		Alias /download /var/lib/ocsinventory-reports/download
+    </VirtualHost>
+</IfModule>
+```
+
+Activar la configuración de `Apache2`, establecer persisos necesarios y reiniciar el servicio
+
+```
+a2enconf ocsinventory-reports.conf
+a2enconf z-ocsinventory-server.conf
+a2enmod ssl
+a2ensite OCSInventory-NG.conf
+chown www-data:www-data -R /var/lib/ocsinventory-reports
+systemctl restart apache2
+```
+
+Acceder a través de un navegador web a la dirección `http://127.0.0.1/ocsreports` y configurar los parámetros de acceso a la base de datos. Concluido ese proceso, el asistente mostrará el incio de sesión, para lo cual se debe utilizar como credenciales de acceso el par usuario/contraseña `admin/admin`.
+
+Deshabilitar el asistente web de instalación
+
+```
+mv /usr/share/ocsinventory-reports/ocsreports/install.php{,.org}
+```
+
+Establecer límites de subida de ficheros hasta `300Mb` en `PHP`. Es solo necesario si se fuese a utilizar OCSInventory-NG para el despliegue de paquetes de instalación.
+
+```
+sed -i "s/^upload_max_filesize = 2M/upload_max_filesize = 300M/;
+	s/^post_max_size = 8M/post_max_size = 300M/" \
+	/etc/php/7*/apache2/php.ini
 ```
 
 ## Breve introducción a Odoo
@@ -45,7 +400,7 @@ En este punto, no es necesario realizar configuración alguna del servicio `post
 Tanto Odoo como la Suite SI tienen dependencias de `python`, las cuales deben ser instaladas en el sistema.
 
 ```
-apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap
+apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap -y
 ```
 
 En el caso específico de Debian 9, deben ser instalados además los paquetes `python-support`, `python-pypdf` y `wkhtmltopdf`. Para los 2 primeros paquetes, deben usarse los disponibles en la versión de Debian 8.
@@ -126,7 +481,7 @@ Reiniciar el servicio `odoo`.
 systemctl restart odoo.service
 ```
 
-Luego de copiados los módulos de la Suite SI, se accede a tavés de un navageador web a la dirección `http://nombre_dirección_ip_servidor_odo:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
+Luego de copiados los módulos de la Suite SI, se accede a tavés de un navageador web a la dirección `http://suitesi.dominio.cu:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
 
 ## Conclusiones
 
@@ -135,4 +490,7 @@ Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7`
 ## Referencias
 
 * [OCS Inventory Professionnel](https://www.ocsinventory-ng.org/)
+* [Instalar OCS Inventory Paso a paso](http://www.latindevelopers.com/articulo/instalar-ocs-inventory/)
+* [Comprehensive Perl Archive Network](https://www.cpan.org/)
+* [OCS Inventory Downloads](https://ocsinventory-ng.org/?page_id=1548&lang=en)
 * [ERP y CRM de código abierto | Odoo](https://www.odoo.com/es_ES/)
