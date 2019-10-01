@@ -395,7 +395,7 @@ PsExec.exe \\NombreEquipo -u Administrador -p ADMIN_PASSWD -c OCS-NG-Windows-Age
 ### Descargas
 
 * [Agent para Windows 2.6.0.0 64bits](https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.6.0.0/OCS-Windows-Agent-2.6.0.0.zip)
-* [Agent para Windows 2.4.0.0 32bits]https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.4.0.0/OCSNG-Windows-Agent-2.4.0.0.zip
+* [Agent para Windows 2.4.0.0 32bits](https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.4.0.0/OCSNG-Windows-Agent-2.4.0.0.zip)
 * [Agent para Unix/Linux 2.4.2](https://github.com/OCSInventory-NG/UnixAgent/releases/download/v2.4.2/Ocsinventory-Unix-Agent-2.4.2.tar.gz)
 * [Windows Packager 2.3](https://github.com/OCSInventory-NG/Packager-for-Windows/releases/download/2.3/OCSNG-Windows-Packager-2.3.zip)
 * [Agent Deployment Tool 2.3](https://github.com/OCSInventory-NG/Agent-Deployment-Tool/releases/download/2.3/OCSNG-Agent-Deploy-Tool-2.3.zip)
