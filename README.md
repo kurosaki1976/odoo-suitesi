@@ -359,19 +359,47 @@ systemctl restart apache2
 
 Acceder a través de un navegador web a la dirección `http://127.0.0.1/ocsreports` y configurar los parámetros de acceso a la base de datos. Concluido ese proceso, el asistente mostrará el incio de sesión, para lo cual se debe utilizar como credenciales de acceso el par usuario/contraseña `admin/admin`.
 
+Verificar parémteros de conexión base de datos `MySQL`
+
+```
+cat /usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php
+
+<?php
+define("DB_NAME", "ocsinventory_db");
+define("SERVER_READ","127.0.0.1");
+define("SERVER_WRITE","127.0.0.1");
+define("COMPTE_BASE","ocsinventory");
+define("PSWD_BASE","OCSUSER_PASSWORD");
+?>
+```
+
 Deshabilitar el asistente web de instalación
 
 ```
 mv /usr/share/ocsinventory-reports/ocsreports/install.php{,.org}
 ```
 
-Establecer límites de subida de ficheros hasta `300Mb` en `PHP`. Es solo necesario si se fuese a utilizar OCSInventory-NG para el despliegue de paquetes de instalación.
+Establecer límites de subida de ficheros hasta `300Mb` en `PHP`. Es solo necesario si se fuese a utilizar `OCSInventory-NG` para el despliegue de paquetes de instalación.
 
 ```
-sed -i "s/^upload_max_filesize = 2M/upload_max_filesize = 300M/;
-	s/^post_max_size = 8M/post_max_size = 300M/" \
-	/etc/php/7*/apache2/php.ini
+sed -i "s/^upload_max_filesize = 2M/upload_max_filesize = 300M/;s/^post_max_size = 8M/post_max_size = 300M/" /etc/php/7.0/apache2/php.ini
+systemctl restart apache2
 ```
+
+A partir de este momento ya se está en condiciones de instalar el software agente de `OCSInventory-NG` en las estaciones y comenzar a poblar la base de datos. El despliegue del software agente se puede realizar mediante política de grupos si se tuviese un controlador de dominio, o utilizar la herramienta PsExec (sólo para Windows) y ejecutar remotamente el `Inventory Agent` con un simple comando y sus parámetros según sean necesarios. El comando puede quedar de la siguiente forma:
+
+```
+PsExec.exe \\NombreEquipo -u Administrador -p ADMIN_PASSWD -c OCS-NG-Windows-Agent-Setup.exe /S /NOSPLASH /NO_SYSTRAY /NOW /SSL=0 /SERVER=https://inventory.dominio.cu/ocsinventory
+```
+
+# Descargas
+
+* [Agent para Windows 2.6.0.0 64bits](https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.6.0.0/OCS-Windows-Agent-2.6.0.0.zip)
+* [Agent para Windows 2.4.0.0 32bits]https://github.com/OCSInventory-NG/WindowsAgent/releases/download/2.4.0.0/OCSNG-Windows-Agent-2.4.0.0.zip
+* [Agent para Unix/Linux 2.4.2](https://github.com/OCSInventory-NG/UnixAgent/releases/download/v2.4.2/Ocsinventory-Unix-Agent-2.4.2.tar.gz)
+* [Windows Packager 2.3](https://github.com/OCSInventory-NG/Packager-for-Windows/releases/download/2.3/OCSNG-Windows-Packager-2.3.zip)
+* [Agent Deployment Tool 2.3](https://github.com/OCSInventory-NG/Agent-Deployment-Tool/releases/download/2.3/OCSNG-Agent-Deploy-Tool-2.3.zip)
+* [Plugins disponibles a partir de la versión 2.2](https://github.com/pluginsOCSInventory-NG)
 
 ## Breve introducción a Odoo
 
@@ -490,6 +518,8 @@ Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7`
 ## Referencias
 
 * [OCS Inventory Professionnel](https://www.ocsinventory-ng.org/)
+* [Setting up OCS Inventory Server] (https://wiki.ocsinventory-ng.org/03.Basic-documentation/Setting-up-a-OCS-Inventory-Server/)
+* [OCS Inventory NG 2.5 install guide on Debian Stretch with SSL and Deployment](https://miloszengel.com/ocs-inventory-ng-2-5-install-guide-on-debian-stretch-with-ssl-and-deployment/)
 * [Instalar OCS Inventory Paso a paso](http://www.latindevelopers.com/articulo/instalar-ocs-inventory/)
 * [Comprehensive Perl Archive Network](https://www.cpan.org/)
 * [OCS Inventory Downloads](https://ocsinventory-ng.org/?page_id=1548&lang=en)
