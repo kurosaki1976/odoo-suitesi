@@ -513,7 +513,7 @@ Luego de copiados los módulos de la Suite SI, se accede a tavés de un navagead
 
 ## Conclusiones
 
-Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7` y `Odoo v8.0`; es invaluable la importancia de un proyecto de esta embargadura dentro del sistema empresarial e incluso privado, en Cuba. Esperamos que este tutorial sirva de guía para su implementación en aquellos escenarios donde se lleve a cabo la migración de servicios a plataformas bajo software libre, apuesta hoy del país en la búsqueda de la independencia y soberanía teconológicas.
+Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7` y `Odoo v8.0`; es invaluable la importancia de un proyecto de esta embargadura -dentro del sistema empresarial e incluso privado- en Cuba. Esperamos que este tutorial sirva de guía para su implementación en aquellos escenarios donde se lleve a cabo la migración de servicios a plataformas bajo software libre, apuesta hoy del país en la búsqueda de la independencia y soberanía teconológicas.
 
 ## Referencias
 
