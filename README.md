@@ -16,7 +16,7 @@ OCSInventory-NG funciona con el servidor web `Apache2` y el gestor de base de da
 
 ## Instalación de paquetes necesarios
 
-```
+```bash
 apt install apache2 libapache2-mod-perl2 libxml-simple-perl libcompress-zlib-perl libdbi-perl libdbd-mysql-perl libapache-dbi-perl libnet-ip-perl libsoap-lite-perl libarchive-zip-perl make build-essential php-pclzip php7.0 libapache2-mod-php7.0 php7.0-common php-pear php7.0-cli php7.0-ldap libxml-simple-perl libio-compress-lzma-perl php7.0-gd php7.0-curl php-soap libsoap-lite-perl libmojolicious-perl libplack-perl php-mbstring php-zip -y
 ```
 
@@ -363,7 +363,8 @@ Verificar parémteros de conexión base de datos `MySQL`
 
 ```bash
 cat /usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php
-
+```
+```php
 <?php
 define("DB_NAME", "ocsinventory_db");
 define("SERVER_READ","127.0.0.1");
@@ -417,7 +418,7 @@ Existen varios métodos de instalación de Odoo, y aunque parezca paradójico, t
 
 Para su buen funcionamiento Odoo necesita un servidor PostgreSQL como gestor de bases de datos. Por defecto, la instancia de Odoo se ejecuta en el mismo host que funciona como servidor de bases de datos, aunque se pude utilizar un host distinto; pero no es objetivo de este tutorial.
 
-```
+```bash
 apt install postgresql -y
 ```
 
@@ -427,13 +428,13 @@ En este punto, no es necesario realizar configuración alguna del servicio `post
 
 Tanto Odoo como la Suite SI tienen dependencias de `python`, las cuales deben ser instaladas en el sistema.
 
-```
+```bash
 apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap -y
 ```
 
 En el caso específico de Debian 9, deben ser instalados además los paquetes `python-support`, `python-pypdf` y `wkhtmltopdf`. Para los 2 primeros paquetes, deben usarse los disponibles en la versión de Debian 8.
 
-```
+```bash
 wget https://packages.debian.org/jessie/all/python-support/download/python-support_1.0.15_all.deb
 wget https://packages.debian.org/jessie/all/python-support/download/python-pypdf_1.13-2_all.deb
 dpkg -i python-support_1.0.15_all.deb python-pypdf_1.13-2_all.deb
@@ -444,13 +445,13 @@ dpkg -i wkhtmltox_0.12.5-1.stretch_amd64.deb
 
 La instalación del paquete `wkhtmltox` generará un error de dependecias, el cual se soluciona ejecutando:
 
-```
+```bash
 apt install -f
 ```
 
 También se deben establecer los enlaces simbólicos del paquete `wkhtmltox`.
 
-```
+```bash
 ln -s /usr/local/bin/wkhtmltopdf /usr/bin
 ln -s /usr/local/bin/wkhtmltoimage /usr/bin
 ```
@@ -459,7 +460,7 @@ Un vez instaladas las dependencias, se procede con Odoo.
 
 * Primer método: utilizando repositorio de paquetes en línea de Odoo.
 
-```
+```bash
 wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
 echo "deb https://nightly.odoo.com/8.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
 apt update && apt install odoo -y
@@ -467,20 +468,20 @@ apt update && apt install odoo -y
 
 * Segundo método: descargando la última versión del paquete.
 
-```
+```bash
 wget https://nightly.odoo.com/8.0/nightly/deb/odoo_8.0.20171001_all.deb
 dpkg -i odoo_8.0.20171001_all.deb
 ```
 
 Una vez instalado Odoo usando cualquiera de los métodos propuestos, se debe asignar una contraseña al usuario `odoo` en el gestor de bases de datos y editar el fichero de configuración general del servicio.
 
-```
+```bash
 su - postgres
 psql
 \password odoo
 ```
 
-```
+```bash
 mv /etc/odoo/openerp-server.conf{,.org}
 nano /etc/odoo/openerp-server.conf
 
@@ -498,14 +499,14 @@ timezone = America/Havana
 
 La instalación de la Suite SI se resume a la copia de los módulos que la componen `df_lt_base`, `df_lt_ssi`, `df_technical_resources_managment_no_hr`, `mail_sender_patch` y `web_datagrid`, dentro del sistema de archivos e instalarlos usando el asistente web de Odoo.
 
-```
+```bash
 mkdir -p /opt/suite/modulos
 unzip SuiteSI.zip -d /opt/suite/modulos/
 ```
 
 Reiniciar el servicio `odoo`.
 
-```
+```bash
 systemctl restart odoo.service
 ```
 
