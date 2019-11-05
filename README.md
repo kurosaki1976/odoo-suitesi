@@ -22,7 +22,7 @@ apt install apache2 libapache2-mod-perl2 libxml-simple-perl libcompress-zlib-per
 
 Instalar dependencias CPAN
 
-```
+```bash
 cpan
 install CPAN
 reload cpan
@@ -32,7 +32,7 @@ exit
 
 Crear certificado TLS autofirmado y asignar permisos necesarios
 
-```
+```bash
 openssl req -x509 -sha512 -days 3650 -nodes \
 	-subj "/C=CU/ST=Provincia/L=Ciudad/O=Organización/OU=IT/CN=SuiteSI/emailAddress=postmaster@dominio.cu/" \
 	-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf \
@@ -48,13 +48,13 @@ chmod 0400 /etc/ssl/private/SuiteSI.key
 
 Comprobar correcta creación del certificado
 
-```
+```bash
 openssl x509 -in /etc/ssl/certs/SuiteSI.crt -text -noout
 ```
 
 Establecer zona horaria para `PHP`
 
-```
+```bash
 cp /etc/php/7*/apache2/php.ini{,.org}
 sed -i "s/^;date\.timezone =.*$/date\.timezone = 'America\/Havana'/" /etc/php/7*/apache2/php.ini
 ```
@@ -63,13 +63,13 @@ sed -i "s/^;date\.timezone =.*$/date\.timezone = 'America\/Havana'/" /etc/php/7*
 
 Instalar servidor de base de datos MySQL
 
-```
+```bash
 apt install mysql-server php-mysql -y
 ```
 
 Configurar base de datos para OCSInventory-NG
 
-```
+```bash
 mysql -u root
 	SET PASSWORD FOR 'root'@'localhost' = PASSWORD('MYSQL_ROOT_PASSWORD');
 	CREATE DATABASE ocsinventory_db;
@@ -83,7 +83,7 @@ quit
 
 Descargar el paquete e instalarlo
 
-```
+```bash
 wget https://github.com/OCSInventory-NG/OCSInventory-ocsreports/releases/download/2.3.1/OCSNG_UNIX_SERVER-2.3.1.tar.gz
 tar -xzmf OCSNG_UNIX_SERVER-2.3.1.tar.gz -C /usr/src/
 cd /usr/src/OCSNG_UNIX_SERVER-2.3.1
@@ -94,12 +94,12 @@ sh setup.sh
 
 Editar los ficheros de configuración de OCSInventory-NG
 
-```
+```bash
 mv /etc/apache2/conf-available/ocsinventory-reports.conf{,.org}
 mv /etc/apache2/conf-available/z-ocsinventory-server.conf{,.org}
 ```
 
-```
+```bash
 nano /etc/apache2/conf-available/ocsinventory-reports.conf
 
 Alias /ocsreports /usr/share/ocsinventory-reports/ocsreports
@@ -153,7 +153,7 @@ Alias /snmp /var/lib/ocsinventory-reports/snmp
 </Directory>
 ```
 
-```
+```bash
 nano /etc/apache2/conf-available/z-ocsinventory-server.conf
 
 <IfModule mod_perl.c>
@@ -293,7 +293,7 @@ nano /etc/apache2/conf-available/z-ocsinventory-server.conf
 
 * Nota: Prestar especial atención a los parámetros de conexión con el servidor `MySQL`.
 
-```
+```bash
 PerlSetEnv OCS_DB_HOST 127.0.0.1
 PerlSetEnv OCS_DB_PORT 3306
 PerlSetEnv OCS_DB_NAME ocsinventory_db
@@ -304,7 +304,7 @@ PerlSetVar OCS_DB_PWD OCSUSER_PASSWORD
 
 Crear host virtual para OCSInventory-NG
 
-```
+```bash
 nano /etc/apache2/sites-available/OCSInventory-NG.conf
 
 <VirtualHost *:80>
@@ -348,7 +348,7 @@ nano /etc/apache2/sites-available/OCSInventory-NG.conf
 
 Activar la configuración de `Apache2`, establecer persisos necesarios y reiniciar el servicio
 
-```
+```bash
 a2enconf ocsinventory-reports.conf
 a2enconf z-ocsinventory-server.conf
 a2enmod ssl
@@ -361,7 +361,7 @@ Acceder a través de un navegador web a la dirección `http://127.0.0.1/ocsrepor
 
 Verificar parémteros de conexión base de datos `MySQL`
 
-```
+```bash
 cat /usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php
 
 <?php
@@ -375,20 +375,20 @@ define("PSWD_BASE","OCSUSER_PASSWORD");
 
 Deshabilitar el asistente web de instalación
 
-```
+```bash
 mv /usr/share/ocsinventory-reports/ocsreports/install.php{,.org}
 ```
 
 Establecer límites de subida de ficheros hasta `300Mb` en `PHP`. Es solo necesario si se fuese a utilizar `OCSInventory-NG` para el despliegue de paquetes de instalación.
 
-```
+```bash
 sed -i "s/^upload_max_filesize = 2M/upload_max_filesize = 300M/;s/^post_max_size = 8M/post_max_size = 300M/" /etc/php/7.0/apache2/php.ini
 systemctl restart apache2
 ```
 
 A partir de este momento ya se está en condiciones de instalar el software agente de `OCSInventory-NG` en las estaciones y comenzar a poblar la base de datos. El despliegue del software agente se puede realizar mediante política de grupos si se tuviese un controlador de dominio, o utilizar la herramienta PsExec (sólo para Windows) y ejecutar remotamente el `Inventory Agent` con un simple comando y sus parámetros según sean necesarios. El comando puede quedar de la siguiente forma:
 
-```
+```bash
 PsExec.exe \\NombreEquipo -u Administrador -p ADMIN_PASSWD -c OCS-NG-Windows-Agent-Setup.exe /S /NOSPLASH /NO_SYSTRAY /NOW /SSL=0 /SERVER=https://inventory.dominio.cu/ocsinventory
 ```
 
