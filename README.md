@@ -511,7 +511,7 @@ Reiniciar el servicio `odoo`.
 systemctl restart odoo.service
 ```
 
-Luego de copiados los módulos de la Suite SI, se accede a tavés de un navageador web a la dirección `http://suitesi.dominio.cu:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
+Luego de copiados los módulos de la Suite SI, se accede a tavés de un navegador web a la dirección `http://suitesi.dominio.cu:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
 
 ## Conclusiones
 
