@@ -502,6 +502,7 @@ La instalación de la Suite SI se resume a la copia de los módulos que la compo
 ```bash
 mkdir -p /opt/suite/modulos
 unzip SuiteSI.zip -d /opt/suite/modulos/
+chown -R root:root /opt/suite/modulos/
 ```
 
 Reiniciar el servicio `odoo`.
