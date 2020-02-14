@@ -179,7 +179,7 @@ nano /etc/apache2/conf-available/z-ocsinventory-server.conf
 	PerlSetEnv OCS_OPT_SECURITY_LEVEL 0
 	PerlSetEnv OCS_OPT_LOCK_REUSE_TIME 600
 	PerlSetEnv OCS_OPT_TRACE_DELETED 0
-	PerlSetEnv OCS_OPT_FREQUENCY 0  
+	PerlSetEnv OCS_OPT_FREQUENCY 0
 	PerlSetEnv OCS_OPT_INVENTORY_DIFF 1
 	PerlSetEnv OCS_OPT_INVENTORY_TRANSACTION 1
 	PerlSetEnv OCS_OPT_INVENTORY_WRITE_DIFF 1
@@ -213,7 +213,7 @@ nano /etc/apache2/conf-available/z-ocsinventory-server.conf
 	PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP 0
 	PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP_CACHE_TIME 300
 	PerlSetEnv OCS_OPT_INVENTORY_FILTER_ON 0
-	PerlSetEnv OCS_OPT_DATA_FILTER 0 
+	PerlSetEnv OCS_OPT_DATA_FILTER 0
 	PerlSetEnv OCS_OPT_REGISTRY 1
 	PerlSetEnv OCS_OPT_SNMP 0
 	PerlSetEnv OCS_OPT_SNMP_INVENTORY_DIFF 1
@@ -364,6 +364,7 @@ Verificar parémteros de conexión base de datos `MySQL`
 ```bash
 cat /usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php
 ```
+
 ```php
 <?php
 define("DB_NAME", "ocsinventory_db");
@@ -391,6 +392,28 @@ A partir de este momento ya se está en condiciones de instalar el software agen
 
 ```bash
 PsExec.exe \\NombreEquipo -u Administrador -p ADMIN_PASSWD -c OCS-NG-Windows-Agent-Setup.exe /S /NOSPLASH /NO_SYSTRAY /NOW /SSL=0 /SERVER=https://inventory.dominio.cu/ocsinventory
+```
+
+En el caso de contar con `hosts` ejecutando sistemas operativos de la familia `Debian/Ubuntu GNU/Linux`, se deben instalar además del paquete `ocsinventory-agent`, dependencias adicionales de `perl`.
+
+```bash
+apt install libmodule-install-perl dmidecode libxml-simple-perl libcompress-zlib-perl libnet-ip-perl libwww-perl libdigest-md5-perl libdata-uuid-perl ocsinventory-agent
+```
+
+> **NOTA**: En `Debian Buster` las dependencias `libxml-simple-perl` y `libdigest-md5-perl` no son necesarias.
+
+Editar el fichero `/etc/ocsinventory/ocsinventory-agent.cfg`.
+
+```bash
+nano /etc/ocsinventory/ocsinventory-agent.cfg
+
+server=https://inventory.dominio.cu/ocsinventory
+```
+
+Por defecto, una vez instalado el paquete agente, se crea una tarea de `cron` que se ejecuta diariamente, este está ubicada en `/etc/cron.daily/ocsinventory-agent`. No obstante, se puede realizar el inventario del equipo de forma manual. Ejemplo:
+
+```bash
+ocsinventory-agent --server https://inventory.dominio.cu/ocsinventory --ssl=0 --force
 ```
 
 ### Descargas
@@ -429,7 +452,7 @@ En este punto, no es necesario realizar configuración alguna del servicio `post
 Tanto Odoo como la Suite SI tienen dependencias de `python`, las cuales deben ser instaladas en el sistema.
 
 ```bash
-apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap python-click python-beautifulsoup python-cssselect python-defusedxml python-gdata python-gevent python-gunicorn python-httplib2 python-odoorpc python-psycogreen python-pycryptopp python-pycurl python-gobject python-serial python-apt python-debian python-debianbts python-usb python-webdav python-setuptools-git python-soappy python-sqlalchemy python-zsi python-dbf python-flask python-protobuf python-pymssql python-shellescape -y
+apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap -y
 ```
 
 En el caso específico de Debian 9, deben ser instalados además los paquetes `python-support`, `python-pypdf` y `wkhtmltopdf`. Para los 2 primeros paquetes, deben usarse los disponibles en la versión de Debian 8.
@@ -502,20 +525,19 @@ La instalación de la Suite SI se resume a la copia de los módulos que la compo
 ```bash
 mkdir -p /opt/suite/modulos
 unzip SuiteSI.zip -d /opt/suite/modulos/
-chown -R root:root /opt/suite/modulos/
 ```
 
-Reiniciar el servicio `odoo`.
+Reiniciar el servicio `odoo`
 
 ```bash
 systemctl restart odoo.service
 ```
 
-Luego de copiados los módulos de la Suite SI, se accede a tavés de un navegador web a la dirección `http://suitesi.dominio.cu:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
+Luego de copiados los módulos de la Suite SI, se accede a tavés de un navageador web a la dirección `http://suitesi.dominio.cu:8069/`, se crea la base da datos usando el asistente que se muestra y posteriormente se accede al sistema y se instalan los módulos siguiendo la ruta `Configuración\Módulos\Módulos locales`.
 
 ## Conclusiones
 
-Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7` y `Odoo v8.0`; es invaluable la importancia de un proyecto de esta embargadura -dentro del sistema empresarial e incluso privado- en Cuba. Esperamos que este tutorial sirva de guía para su implementación en aquellos escenarios donde se lleve a cabo la migración de servicios a plataformas bajo software libre, apuesta hoy del país en la búsqueda de la independencia y soberanía teconológicas.
+Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7` y `Odoo v8.0`; es invaluable la importancia de un proyecto de esta embargadura dentro del sistema empresarial e incluso privado, en Cuba. Esperamos que este tutorial sirva de guía para su implementación en aquellos escenarios donde se lleve a cabo la migración de servicios a plataformas bajo software libre, apuesta hoy del país en la búsqueda de la independencia y soberanía teconológicas.
 
 ## Referencias
 
@@ -526,3 +548,4 @@ Aunque la Suite SI utiliza paquetería un tanto obsoleta, como son `Python v2.7`
 * [Comprehensive Perl Archive Network](https://www.cpan.org/)
 * [OCS Inventory Downloads](https://ocsinventory-ng.org/?page_id=1548&lang=en)
 * [ERP y CRM de código abierto | Odoo](https://www.odoo.com/es_ES/)
+* [Install OCS Inventory Agent on Debian 10/Ubuntu 18.04](https://kifarunix.com/install-ocs-inventory-agent-on-debian-10-ubuntu-18-04/)
