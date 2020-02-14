@@ -388,7 +388,7 @@ sed -i "s/^upload_max_filesize = 2M/upload_max_filesize = 300M/;s/^post_max_size
 systemctl restart apache2
 ```
 
-A partir de este momento ya se está en condiciones de instalar el software agente de `OCSInventory-NG` en las estaciones y comenzar a poblar la base de datos. El despliegue del software agente se puede realizar mediante política de grupos si se tuviese un controlador de dominio, o utilizar la herramienta PsExec (sólo para Windows) y ejecutar remotamente el `Inventory Agent` con un simple comando y sus parámetros según sean necesarios. El comando puede quedar de la siguiente forma:
+A partir de este momento ya se está en condiciones de instalar el software agente de `OCSInventory-NG` en las estaciones y comenzar a poblar la base de datos. El despliegue del agente se puede realizar mediante política de grupos si se tuviese un controlador de dominio, o utilizar la herramienta PsExec (sólo para Windows) y ejecutar remotamente el `Inventory Agent` con un simple comando y sus parámetros según sean necesarios. El comando puede quedar de la siguiente forma:
 
 ```bash
 PsExec.exe \\NombreEquipo -u Administrador -p ADMIN_PASSWD -c OCS-NG-Windows-Agent-Setup.exe /S /NOSPLASH /NO_SYSTRAY /NOW /SSL=0 /SERVER=https://inventory.dominio.cu/ocsinventory
@@ -402,7 +402,7 @@ apt install libmodule-install-perl dmidecode libxml-simple-perl libcompress-zlib
 
 > **NOTA**: En `Debian Buster` las dependencias `libxml-simple-perl` y `libdigest-md5-perl` no son necesarias.
 
-Editar el fichero `/etc/ocsinventory/ocsinventory-agent.cfg`.
+Editar el fichero `/etc/ocsinventory/ocsinventory-agent.cfg` y establecer el servidor de `OCSInventory-NG`.
 
 ```bash
 nano /etc/ocsinventory/ocsinventory-agent.cfg
@@ -410,7 +410,7 @@ nano /etc/ocsinventory/ocsinventory-agent.cfg
 server=https://inventory.dominio.cu/ocsinventory
 ```
 
-Por defecto, una vez instalado el paquete agente, se crea una tarea de `cron` que se ejecuta diariamente, este está ubicada en `/etc/cron.daily/ocsinventory-agent`. No obstante, se puede realizar el inventario del equipo de forma manual. Ejemplo:
+Por defecto, una vez instalado el agente, se crea una tarea de `cron` que se ejecuta diariamente; está ubicada en `/etc/cron.daily/ocsinventory-agent`. No obstante, se puede realizar el inventario del equipo de forma manual. Ejemplo:
 
 ```bash
 /usr/bin/ocsinventory-agent --server https://inventory.dominio.cu/ocsinventory --ssl=0 --force
