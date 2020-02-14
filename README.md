@@ -413,7 +413,7 @@ server=https://inventory.dominio.cu/ocsinventory
 Por defecto, una vez instalado el paquete agente, se crea una tarea de `cron` que se ejecuta diariamente, este está ubicada en `/etc/cron.daily/ocsinventory-agent`. No obstante, se puede realizar el inventario del equipo de forma manual. Ejemplo:
 
 ```bash
-ocsinventory-agent --server https://inventory.dominio.cu/ocsinventory --ssl=0 --force
+/usr/bin/ocsinventory-agent --server https://inventory.dominio.cu/ocsinventory --ssl=0 --force
 ```
 
 ### Descargas
