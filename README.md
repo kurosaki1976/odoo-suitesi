@@ -458,8 +458,8 @@ apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap
 En el caso específico de Debian 9, deben ser instalados además los paquetes `python-support`, `python-pypdf` y `wkhtmltopdf`. Para los 2 primeros paquetes, deben usarse los disponibles en la versión de Debian 8.
 
 ```bash
-wget https://packages.debian.org/jessie/all/python-support/download/python-support_1.0.15_all.deb
-wget https://packages.debian.org/jessie/all/python-support/download/python-pypdf_1.13-2_all.deb
+wget http://http.us.debian.org/debian/pool/main/p/python-support/python-support_1.0.15_all.deb
+wget http://http.us.debian.org/debian/pool/main/p/python-pypdf/python-pypdf_1.13-2_all.deb
 dpkg -i python-support_1.0.15_all.deb python-pypdf_1.13-2_all.deb
 
 wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.stretch_amd64.deb
