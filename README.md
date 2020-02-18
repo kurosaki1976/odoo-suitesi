@@ -452,7 +452,7 @@ En este punto, no es necesario realizar configuración alguna del servicio `post
 Tanto Odoo como la Suite SI tienen dependencias de `python`, las cuales deben ser instaladas en el sistema.
 
 ```bash
-apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-pyldap python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap -y
+apt install libldap2-dev libsasl2-dev python-vobject python-qrcode python-yaml node-less python-babel python-decorator python-docutils python-feedparser python-imaging python-jinja2 python-libxslt1 python-lxml python-mako python-mock python-openid python-passlib python-psutil python-psycopg2 python-pychart python-pydot python-pyparsing python-reportlab python-requests python-suds python-vatnumber python-werkzeug python-xlwt python-pymysql python-mysql.connector python-crypto python-simplejson python-unittest2 python-ldap -y
 ```
 
 En el caso específico de Debian 9, deben ser instalados además los paquetes `python-support`, `python-pypdf` y `wkhtmltopdf`. Para los 2 primeros paquetes, deben usarse los disponibles en la versión de Debian 8.
@@ -486,7 +486,7 @@ Un vez instaladas las dependencias, se procede con Odoo.
 ```bash
 wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
 echo "deb https://nightly.odoo.com/8.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
-apt update && apt install odoo -y
+apt update && apt install apt-transport-https odoo -y
 ```
 
 * Segundo método: descargando la última versión del paquete.
