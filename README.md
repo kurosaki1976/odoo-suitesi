@@ -523,8 +523,8 @@ timezone = America/Havana
 La instalación de la Suite SI se resume a la copia de los módulos que la componen `df_lt_base`, `df_lt_ssi`, `df_technical_resources_managment_no_hr`, `mail_sender_patch` y `web_datagrid`, dentro del sistema de archivos e instalarlos usando el asistente web de Odoo.
 
 ```bash
-mkdir -p /opt/suite/modulos
-unzip SuiteSI.zip -d /opt/suite/modulos/
+mkdir -p /opt/suitesi/modulos
+unzip SuiteSI.zip -d /opt/suitesi/modulos/
 ```
 
 Reiniciar el servicio `odoo`
