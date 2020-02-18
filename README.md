@@ -520,11 +520,12 @@ timezone = America/Havana
 
 ### Suite de Seguridad Informática
 
-La instalación de la Suite SI se resume a la copia de los módulos que la componen `df_lt_base`, `df_lt_ssi`, `df_technical_resources_managment_no_hr`, `mail_sender_patch` y `web_datagrid`, dentro del sistema de archivos e instalarlos usando el asistente web de Odoo.
+La instalación de la Suite SI se resume a la copia de los módulos que la componen `df_lt_base`, `df_lt_ssi`, `df_technical_resources_managment_no_hr`, `mail_sender_patch`, `users_ldap_populate` y `web_datagrid`, dentro del sistema de archivos e instalarlos usando el asistente web de Odoo.
 
 ```bash
 mkdir -p /opt/suitesi/modulos
 unzip SuiteSI.zip -d /opt/suitesi/modulos/
+chown -R root.root /opt/suitesi/modulos/
 ```
 
 Reiniciar el servicio `odoo`
